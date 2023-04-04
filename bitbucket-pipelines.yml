@@ -1,0 +1,23 @@
+# This is a sample build configuration for JavaScript.
+# Check our guides at https://confluence.atlassian.com/x/14UWN for more examples.
+# Only use spaces to indent your .yml configuration.
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
+image: node:13.7.0
+
+pipelines:
+  default:
+    - step:
+        name: Coverage
+        caches:
+          - node
+        script:
+          - npm install -g codecov
+          - npm install
+          - touch ./src/env.ts
+          - echo $BITBUCKET_TAG
+          - |
+              echo \
+              "VERSION=test-version\nMONGO_URI=${MONGO_CONNECT}\nJWT_KEY=${JWT_KEY}\nJWT_EXPIRATION=${JWT_EXPIRATION}" > .env
+          - npm run test:cov
+          - codecov
